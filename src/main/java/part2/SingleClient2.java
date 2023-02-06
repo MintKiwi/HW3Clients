@@ -1,90 +1,65 @@
 package part2;
 
+
+import io.swagger.client.ApiClient;
+import io.swagger.client.ApiException;
+import io.swagger.client.api.SwipeApi;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.apache.http.HttpException;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpResponseInterceptor;
-import org.apache.http.StatusLine;
-import org.apache.http.client.HttpRequestRetryHandler;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.protocol.HttpContext;
-import org.apache.http.util.EntityUtils;
-import part1.MultithreadClient;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 
-public class SingleClient {
-    private static String url = "http://34.215.96.158:8080/twinder/swipe/";
+public class SingleClient2 {
+    private static String url = "http://54.213.19.181:8080/twinder/swipe/";
 
 
-    public static void main(String[] args) throws Exception {
-        long start = System.currentTimeMillis();
-        for (int i = 0; i < 1000; i++) {
-            executePost(new part1.MultithreadClient());
+    public static void run(MultithreadClient2 obj) throws RuntimeException{
+        SwipeApi swipeApi = new SwipeApi();
+        io.swagger.client.model.SwipeDetails body= new io.swagger.client.model.SwipeDetails();
+        ApiClient apiClient = swipeApi.getApiClient();
+        String[] strs = generateRandom();
+        apiClient.setBasePath(url);
+        body.setSwiper(strs[1]);
+        body.setSwipee(strs[2]);
+        body.setComment(strs[3]);
+        try{
+            long start = System.currentTimeMillis();
+            //return status code
+            int result = swipeApi.swipe(body,strs[0]);
+            //retry times maximum
+            int i = 0;
+            while(result / 100 != 2 && i < 5){
+                result = swipeApi.swipe(body,strs[0]);
+                i++;
+            }
+            long end = System.currentTimeMillis();
+            //record successful and unsuccessful request counts
+            if(result/100 == 2) {
+                obj.getSuccessCount().getAndIncrement();
+            }
+            else obj.getFailCount().getAndIncrement();
+            CSVwritein.write(start, "POST",end - start, result);
+        } catch (ApiException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
 
-        long end = System.currentTimeMillis();
-        System.out.println("The total run time to send 1000 requests is " + (end - start));
-        System.out.println("Response time of a requests is " + ((end - start) / 1000) + " milliseconds");
     }
+    //generate random data
+    public static String[] generateRandom(){
+        String[] str = new String [4];
 
-    public static void executePost(MultithreadClient obj) throws Exception {
-        long start = System.currentTimeMillis();
-        HttpRequestRetryHandler requestRetryHandler = new HttpRequestRetryHandler() {
-            @Override
-            public boolean retryRequest(IOException exception, int executionCount, HttpContext context) {
-                return executionCount <= 5;
-            }
-        };
         String leftorright = new SecureRandom().nextInt(2) == 0 ? "left" : "right";
         String swiper = String.valueOf(new SecureRandom().nextInt(5000) + 1);
         String swipee = String.valueOf(new SecureRandom().nextInt(1000000) + 1);
         String comment = RandomStringUtils.randomAlphabetic(256);
-        String json = new StringBuilder()
-                .append("{")
-                .append("\'swiper\':\'" + swiper + "\',")
-                .append("\'swipee\':\'" + swipee + "\',")
-                .append("\'comment\':\'" + comment + "\'")
-                .append("}").toString();
-        try (CloseableHttpClient httpClient = HttpClients.custom().addInterceptorLast(new HttpResponseInterceptor() {
-            @Override
-            public void process(HttpResponse response, HttpContext context) throws HttpException, IOException {
-                if (response.getStatusLine().getStatusCode() / 100 != 2) {
-                    throw new IOException("Retry it");
-                }
-
-            }
-        }).setRetryHandler(requestRetryHandler).build()) {
-            final HttpPost httpPost = new HttpPost(url + leftorright);
-            StringEntity requestEntity = new StringEntity(json);
-
-            httpPost.setEntity(requestEntity);
-            CloseableHttpResponse response = null;
-            try {
-                response = httpClient.execute(httpPost);
-                StatusLine statusLine = response.getStatusLine();
-                long end = System.currentTimeMillis();
-                System.out.println("The total run time to send a request is " + (end - start));
-                if (statusLine.getStatusCode() / 100 == 2) obj.increaseSuccessCount();
-                else obj.increaseFailCount();
-//                System.out.println(statusLine.getStatusCode() + " " + statusLine.getReasonPhrase());
-                String responseBody = EntityUtils.toString(response.getEntity(), StandardCharsets.UTF_8);
-//                System.out.println("Response body: " + responseBody);
-            } catch (Exception e) {
-                System.out.println(e);
-            } finally {
-                if (response != null) response.close();
-                httpClient.close();
-
-            }
-        }
+        str[0] = leftorright;
+        str[1] = swiper;
+        str[2] = swipee;
+        str[3] = comment;
+        return str;
 
     }
-}
 
+}

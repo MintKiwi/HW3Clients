@@ -6,8 +6,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 
 
-public class MultithreadClient4 {
-    final static private int NUMTHREADS = 80;
+public class MultithreadClient1 {
+    final static private int NUMTHREADS = 200;
     final static private int TOTALREQUESTS = 500000;
     private AtomicInteger successCount = new AtomicInteger(0);
     private AtomicInteger failCount = new AtomicInteger(0);
@@ -23,7 +23,7 @@ public class MultithreadClient4 {
 
 
     public static void main(String[] args) throws InterruptedException {
-        MultithreadClient4 obj = new MultithreadClient4();
+        MultithreadClient1 obj = new MultithreadClient1();
         //use thread pool to reuse threads more efficiently
         ExecutorService pool = Executors.newCachedThreadPool();
         long start = System.currentTimeMillis();
@@ -59,10 +59,10 @@ public class MultithreadClient4 {
     }
 
 
-    public static void sends(int loopNum, MultithreadClient4 obj) throws Exception {
+    public static void sends(int loopNum, MultithreadClient1 obj) throws Exception {
         for (int i = 0; i < loopNum; i++) {
             //call the client to send http post request
-             TT.run(obj);
+             SingleClient1.run(obj);
         }
     }
 

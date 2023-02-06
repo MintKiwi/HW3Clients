@@ -1,71 +1,72 @@
 package part2;
 
-import part1.SingleClient;
-
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicInteger;
 
-public class MultithreadClient {
-    final static private int NUMTHREADS = 10;
+
+public class MultithreadClient2 {
+    final static private int NUMTHREADS = 50;
     final static private int TOTALREQUESTS = 500000;
-    private int successCount = 0;
-    private int failCount = 0;
+    private AtomicInteger successCount = new AtomicInteger(0);
+    private AtomicInteger failCount = new AtomicInteger(0);
 
 
-    public int getFailCount() {
+    public AtomicInteger getFailCount() {
         return failCount;
     }
 
-    public int getSuccessCount() {
+    public AtomicInteger getSuccessCount() {
         return successCount;
     }
 
-    synchronized public void increaseFailCount() {
-        this.failCount++;
-    }
-
-    synchronized public void increaseSuccessCount() {
-        this.successCount++;
-    }
 
     public static void main(String[] args) throws InterruptedException {
+        MultithreadClient2 obj = new MultithreadClient2();
+        //use thread pool to reuse threads more efficiently
+        ExecutorService pool = Executors.newCachedThreadPool();
         long start = System.currentTimeMillis();
-        ExecutorService pool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
         CountDownLatch latch = new CountDownLatch(NUMTHREADS);
-        MultithreadClient obj = new MultithreadClient();
         for (int i = 0; i < NUMTHREADS; i++) {
 
             pool.execute(() -> {
-                try {
-                    sends(TOTALREQUESTS / NUMTHREADS, obj);
+                        try {
+                            sends(TOTALREQUESTS / NUMTHREADS, obj);
+
+                        } catch (Exception e) {
+                            Thread.currentThread().interrupt();
+                        } finally {
+                            latch.countDown();
+                        }
+                    }
 
 
-                } catch (Exception e) {
-                    Thread.currentThread().interrupt();
-                } finally {
-                    latch.countDown();
-                }
-            });
-
+            );
 
         }
         latch.await();
-        pool.shutdown();
         long end = System.currentTimeMillis();
+        pool.shutdown();
         System.out.println("The number of successful requests sent is " + obj.getSuccessCount());
         System.out.println("The number of unsuccessful requests sent is " + obj.getFailCount());
         System.out.println("The total run time for all threads to complete is " + (end - start) + " milliseconds");
-        System.out.println("The total throughput in requests per second is " + (TOTALREQUESTS / ((end - start) / 1000)));
+        System.out.println("The number of thread is " + NUMTHREADS);
+        System.out.println("The total throughput in requests per second is " + (TOTALREQUESTS / ((end - start) / 1000.0)));
+        System.out.println("Little’s Law throughput predictions in requests per second is " + (NUMTHREADS / 0.015));
+
+
     }
 
 
-    public static void sends(int loopNum, MultithreadClient obj) throws Exception {
+    public static void sends(int loopNum, MultithreadClient2 obj) throws Exception {
         for (int i = 0; i < loopNum; i++) {
-            new SingleClient().executePost(obj);
-
+            //call the client to send http post request
+            SingleClient2.run(obj);
         }
     }
+
+
 
 
 }
