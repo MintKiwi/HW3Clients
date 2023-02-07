@@ -10,35 +10,34 @@ import java.io.IOException;
 import java.security.SecureRandom;
 
 public class SingleClient2 {
-    private static String url = "http://54.213.19.181:8080/twinder/swipe/";
+    private static String url = "http://35.90.21.151:8080/twinder/swipe/";
 
 
-    public static void run(MultithreadClient2 obj) throws RuntimeException{
+    public static void run(MultithreadClient2 obj) throws RuntimeException {
         SwipeApi swipeApi = new SwipeApi();
-        io.swagger.client.model.SwipeDetails body= new io.swagger.client.model.SwipeDetails();
+        io.swagger.client.model.SwipeDetails body = new io.swagger.client.model.SwipeDetails();
         ApiClient apiClient = swipeApi.getApiClient();
         String[] strs = generateRandom();
         apiClient.setBasePath(url);
         body.setSwiper(strs[1]);
         body.setSwipee(strs[2]);
         body.setComment(strs[3]);
-        try{
+        try {
             long start = System.currentTimeMillis();
             //return status code
-            int result = swipeApi.swipe(body,strs[0]);
+            int result = swipeApi.swipe(body, strs[0]);
             //retry times maximum
             int i = 0;
-            while(result / 100 != 2 && i < 5){
-                result = swipeApi.swipe(body,strs[0]);
+            while (result / 100 != 2 && i < 5) {
+                result = swipeApi.swipe(body, strs[0]);
                 i++;
             }
             long end = System.currentTimeMillis();
             //record successful and unsuccessful request counts
-            if(result/100 == 2) {
+            if (result / 100 == 2) {
                 obj.getSuccessCount().getAndIncrement();
-            }
-            else obj.getFailCount().getAndIncrement();
-            CSVwritein.write(start, "POST",end - start, result);
+            } else obj.getFailCount().getAndIncrement();
+            CSVwritein.write(start, "POST", end - start, result);
         } catch (ApiException e) {
             throw new RuntimeException(e);
         } catch (IOException e) {
@@ -46,9 +45,10 @@ public class SingleClient2 {
         }
 
     }
+
     //generate random data
-    public static String[] generateRandom(){
-        String[] str = new String [4];
+    public static String[] generateRandom() {
+        String[] str = new String[4];
 
         String leftorright = new SecureRandom().nextInt(2) == 0 ? "left" : "right";
         String swiper = String.valueOf(new SecureRandom().nextInt(5000) + 1);

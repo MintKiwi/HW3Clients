@@ -31,15 +31,15 @@ public class MultithreadClient1 {
         for (int i = 0; i < NUMTHREADS; i++) {
 
             pool.execute(() -> {
-                try {
-                    sends(TOTALREQUESTS / NUMTHREADS, obj);
+                        try {
+                            sends(TOTALREQUESTS / NUMTHREADS, obj);
 
-                } catch (Exception e) {
-                    Thread.currentThread().interrupt();
-                } finally {
-                    latch.countDown();
-                }
-            }
+                        } catch (Exception e) {
+                            Thread.currentThread().interrupt();
+                        } finally {
+                            latch.countDown();
+                        }
+                    }
 
 
             );
@@ -62,11 +62,9 @@ public class MultithreadClient1 {
     public static void sends(int loopNum, MultithreadClient1 obj) throws Exception {
         for (int i = 0; i < loopNum; i++) {
             //call the client to send http post request
-             SingleClient1.run(obj);
+            SingleClient1.run(obj);
         }
     }
-
-
 
 
 }

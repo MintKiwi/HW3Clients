@@ -9,11 +9,8 @@ import org.apache.commons.lang3.RandomStringUtils;
 import java.security.SecureRandom;
 
 public class SingleClient1 {
-    private static String url = "http://52.41.206.117:8080/twinder/swipe";
+    private static String url = "http://35.90.21.151:8080/twinder/swipe";
 
-    public static void main(String[] args) {
-        run(new MultithreadClient1());
-    }
     public static void run(MultithreadClient1 obj) throws RuntimeException{
         SwipeApi swipeApi = new SwipeApi();
         io.swagger.client.model.SwipeDetails body= new io.swagger.client.model.SwipeDetails();
@@ -35,10 +32,6 @@ public class SingleClient1 {
             //record successful and unsuccessful request counts
             if(result/100 == 2) obj.getSuccessCount().getAndIncrement();
             else obj.getFailCount().getAndIncrement();
-
-
-
-
 
 
         } catch (ApiException e) {

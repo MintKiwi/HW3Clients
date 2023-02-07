@@ -7,7 +7,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 
 public class MultithreadClient2 {
-    final static private int NUMTHREADS = 50;
+    final static private int NUMTHREADS = 200;
     final static private int TOTALREQUESTS = 500000;
     private AtomicInteger successCount = new AtomicInteger(0);
     private AtomicInteger failCount = new AtomicInteger(0);
@@ -65,8 +65,6 @@ public class MultithreadClient2 {
             SingleClient2.run(obj);
         }
     }
-
-
 
 
 }
