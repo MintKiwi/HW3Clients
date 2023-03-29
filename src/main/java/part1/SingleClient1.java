@@ -16,9 +16,11 @@ import java.util.Collections;
 import java.util.List;
 
 public class SingleClient1 {
-    private static String url_post = "http://new-101717130.us-west-2.elb.amazonaws.com/twinder/swipe";
-    private static String url_match = "http://new-101717130.us-west-2.elb.amazonaws.com/twinder/matches/";
-    private static String url_stats = "http://new-101717130.us-west-2.elb.amazonaws.com/twinder/stats/";
+
+    private static String url_post = "http://new-893605267.us-west-2.elb.amazonaws.com:8080/twinder/swipe";
+    private static String url_match = "http://new-893605267.us-west-2.elb.amazonaws.com:8080/twinder/matches/";
+    private static String url_stats = "http://new-893605267.us-west-2.elb.amazonaws.com:8080/twinder/stats/";
+
 
 static List<Long> postLatencies = Collections.synchronizedList(new ArrayList<Long>());
 

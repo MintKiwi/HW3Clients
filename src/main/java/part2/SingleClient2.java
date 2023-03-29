@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.security.SecureRandom;
 
 public class SingleClient2 {
-    private static String url = "http://35.90.21.151:8080/twinder/swipe/";
+    private static String url = "http://54.203.238.179:8080/twinder/swipe/";
 
 
     public static void run(MultithreadClient2 obj) throws RuntimeException {

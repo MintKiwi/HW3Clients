@@ -17,7 +17,7 @@ public class MultithreadClient1 {
     private AtomicInteger failCount = new AtomicInteger(0);
 
     static List<Long> getLatencies = Collections.synchronizedList(new ArrayList<Long>());
-//    static List<Long> getLatencies1 = Collections.synchronizedList(new ArrayList<Long>());
+
 
 
 
